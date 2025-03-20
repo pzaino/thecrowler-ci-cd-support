@@ -1,0 +1,16 @@
+name: 'CROWler Validation Action'
+description: 'Validates CROWler rules, configurations, events, and agents against their JSON schemas.'
+author: 'Paolo Fabio Zaino'
+inputs:
+  files:
+    description: 'Space-separated list of file paths to validate.'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.files }}
+
+branding:
+  icon: "check-circle"
+  color: "blue"

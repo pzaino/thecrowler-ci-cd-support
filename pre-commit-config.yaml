@@ -3,6 +3,6 @@ repos:
     hooks:
       - id: validate-crowler-logic
         name: Validate CROWler Rules, Configuration, Agents and more
-        entry: python3 ./validate-logic/validate_crowler_logic.py
+        entry: python3 ./validate_crowler_logic.py
         language: system
         files: \.(yaml|yml|json)$
