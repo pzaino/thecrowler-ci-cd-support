@@ -2,6 +2,7 @@ import json
 import yaml
 import argparse
 import os
+import glob
 from jsonschema import validate, ValidationError, SchemaError
 
 import requests
@@ -98,8 +99,20 @@ def main():
     for item in args.files:
         for file in item.split(","):  # Split by commas if needed
             cleaned_file = file.strip()
-            if cleaned_file:
-                file_list.append(cleaned_file)
+            if not cleaned_file:
+                continue
+
+            # Support for Wildcards (e.g., "/tests/*.json")
+            expanded_files = glob.glob(cleaned_file, recursive=True)  # Expand wildcards
+            if expanded_files:
+                file_list.extend(expanded_files)
+            elif os.path.isdir(cleaned_file):  # Support for Directories
+                for root, _, files in os.walk(cleaned_file):
+                    for f in files:
+                        if f.endswith((".json", ".yaml", ".yml")):  # Only validate YAML/JSON files
+                            file_list.append(os.path.join(root, f))
+            else:
+                file_list.append(cleaned_file)  # Normal file
 
     if not file_list:
         print("No files provided for validation.")
