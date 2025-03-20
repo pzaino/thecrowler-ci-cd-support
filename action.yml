@@ -3,7 +3,7 @@ description: 'Validates CROWler rules, configurations, events, and agents agains
 author: 'Paolo Fabio Zaino'
 inputs:
   files:
-    description: 'Space-separated list of file paths to validate.'
+    description: 'Comma-separated list of file paths to validate.'
     required: true
 runs:
   using: 'docker'

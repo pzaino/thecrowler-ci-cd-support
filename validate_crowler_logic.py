@@ -94,7 +94,12 @@ def main():
     parser.add_argument("files", nargs="+", help="Paths to JSON or YAML files to validate")  # Accepts multiple arguments
     args = parser.parse_args()
 
-    file_list = [file.strip() for file in args.files if file.strip()]
+    file_list = []
+    for item in args.files:
+        for file in item.split(","):  # Split by commas if needed
+            cleaned_file = file.strip()
+            if cleaned_file:
+                file_list.append(cleaned_file)
 
     if not file_list:
         print("No files provided for validation.")
