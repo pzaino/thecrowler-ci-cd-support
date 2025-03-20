@@ -9,3 +9,40 @@ The CROWler CI/CD Support is a set of tools and scripts that help you to automat
 The CROWler CI/CD Support provides the following features:
 
 - **Automated Logic Validation**: The CROWler CI/CD Support can automatically validate the logic of your CROWler configuration, rules, events, agents and more.
+
+## Usage on GitHub Actions
+
+Just create an action as this one (in your .github/workflows/crowler-validate.yml):
+
+```yaml
+---
+name: Test CROWler Validation Action
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validate CROWler Rulesets, Agents & Configs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Expand Wildcards & Run CROWler Validation
+        run: |
+          FILES=$(find rules agents -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) | tr '\n' ',')
+          echo "Validating files: $FILES"
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+      - name: Run CROWler Validation Action
+        uses: pzaino/thecrowler-ci-cd-support@v1.0.1
+        with:
+          files: "${{ env.FILES }}"
+```
