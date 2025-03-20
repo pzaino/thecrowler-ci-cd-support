@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: validate-crowler-logic
+        name: Validate CROWler Rules, Configuration, Agents and more
+        entry: python3 ./validate-logic/validate_crowler_logic.py
+        language: system
+        files: \.(yaml|yml|json)$

@@ -1,0 +1,11 @@
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
