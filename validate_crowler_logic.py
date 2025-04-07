@@ -1,6 +1,7 @@
 import json
 import yaml
 import argparse
+import subprocess
 import os
 import glob
 from jsonschema import validate, ValidationError, SchemaError
@@ -90,6 +91,15 @@ def detect_schema_type(data):
             return "source"
     return None
 
+def run_js_syntax_check():
+    if os.path.isdir('plugins'):
+        print("🔍 Running JavaScript syntax validation for plugins/...")
+        try:
+            subprocess.run(['npm', 'run', 'check-syntax'], check=True)
+        except subprocess.CalledProcessError as e:
+            print("❌ JavaScript syntax validation failed.")
+            exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description="Validate CROWler JSON/YAML files against their schemas")
     parser.add_argument("files", nargs="+", help="Paths to JSON or YAML files to validate")  # Accepts multiple arguments
@@ -114,9 +124,11 @@ def main():
             else:
                 file_list.append(cleaned_file)  # Normal file
 
+    # Remove duplicates
+    file_list = list(set(file_list))
+
     if not file_list:
-        print("No files provided for validation.")
-        exit(1)
+        exit(run_js_syntax_check())
 
     fetch_schemas()
 
@@ -134,6 +146,9 @@ def main():
         print(f"Detected schema type: {schema_type} for {file}")
 
         validate_json(data, schema_file, file)
+
+    # Run JavaScript syntax check if plugins directory exists
+    run_js_syntax_check()
 
 if __name__ == "__main__":
     main()

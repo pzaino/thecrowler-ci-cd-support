@@ -9,6 +9,7 @@ The CROWler CI/CD Support is a set of tools and scripts that help you to automat
 The CROWler CI/CD Support provides the following features:
 
 - **Automated Logic Validation**: The CROWler CI/CD Support can automatically validate the logic of your CROWler configuration, rules, events, agents and more.
+- **Auto-detection of correct JS Standard for engine, event and vdi plugins**: The CROWler CI/CD Support can automatically detect the correct JavaScript standard for your engine, event and VDI plugins. So it can verify their syntax correctly (ES 5.1 for ebgine and event plugins, ES 6 for VDI plugins).
 
 ## Usage on GitHub Actions
 

@@ -1,0 +1,13 @@
+{
+    "name": "crowler-js-validator",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+      "check-js-syntax": "node check-js-syntax.js"
+    },
+    "dependencies": {
+      "acorn": "^8.0.0",
+      "glob": "^10.0.0"
+    }
+  }
+  
