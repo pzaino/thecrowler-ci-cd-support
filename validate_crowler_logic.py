@@ -95,7 +95,7 @@ def run_js_syntax_check():
     if os.path.isdir('plugins'):
         print("🔍 Running JavaScript syntax validation for plugins/...")
         try:
-            subprocess.run(['npm', 'run', 'check-syntax'], check=True)
+            subprocess.run(['npm', 'run', 'check-js-syntax'], check=True)
         except subprocess.CalledProcessError as e:
             print("❌ JavaScript syntax validation failed.")
             exit(1)
