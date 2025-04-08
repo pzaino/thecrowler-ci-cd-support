@@ -36,7 +36,6 @@ function safelyParse(content, ecmaVersion, filePath) {
   }
 }
 
-
 files.forEach((file) => {
   console.log(`🔸 Validating: ${file}`);
   const content = fs.readFileSync(file, 'utf8');
@@ -49,11 +48,21 @@ files.forEach((file) => {
     isVDIPlugin = true;
   }
 
-  // Enforce VDI plugin structure: must return an IIFE
-  if (isVDIPlugin && !/return\s*\(function\s*\w*\s*\(/.test(content)) {
-    console.error(`❌ ${file} - VDI plugin must return a self-invoking function (IIFE)`);
-    hasErrors = true;
-    return;
+  // Enforce: exactly one return (function...)() in VDI plugin
+  if (isVDIPlugin) {
+    const iifeMatches = content.match(/return\s*\(\s*function\s*\w*\s*\([^)]*\)\s*\{[\s\S]*?\}\s*\)\s*\([^)]*\)\s*;/g);
+    
+    if (!iifeMatches || iifeMatches.length === 0) {
+      console.error(`❌ ${file} - VDI plugin must contain one return statement with a self-invoking function (IIFE)`);
+      hasErrors = true;
+      return;
+    }
+
+    if (iifeMatches.length > 1) {
+      console.error(`❌ ${file} - VDI plugin contains multiple return statements with IIFEs. Only one is allowed.`);
+      hasErrors = true;
+      return;
+    }
   }
 
   const valid = safelyParse(content, ecmaVersion, file);

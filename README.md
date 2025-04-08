@@ -43,7 +43,7 @@ jobs:
           echo "FILES=$FILES" >> $GITHUB_ENV
 
       - name: Run CROWler Validation Action
-        uses: pzaino/thecrowler-ci-cd-support@v1.0.1
+        uses: pzaino/thecrowler-ci-cd-support@v1.0.7
         with:
           files: "${{ env.FILES }}"
 ```
