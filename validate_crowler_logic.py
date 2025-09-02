@@ -9,11 +9,11 @@ from jsonschema import validate, ValidationError, SchemaError
 import requests
 
 SCHEMA_URLS = {
-    "ruleset": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/ruleset-schema.json",
+    "ruleset": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/crowler-ruleset-schema.json",
     "config": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/crowler-config-schema.json",
     "event": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/crowler-event-schema.json",
     "agent": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/crowler-agent-schema.json",
-    "source": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/source-config-schema.json",
+    "source": "https://raw.githubusercontent.com/pzaino/thecrowler/main/schemas/crowler-source-config-schema.json",
 }
 
 # Define paths to JSON schemas
