@@ -1,0 +1,104 @@
+---
+  name: Release thecrowler-ci-cd-support
+  
+  on:
+    workflow_dispatch:
+      inputs:
+        target_repo:
+          description: "owner/repo of the Action"
+          required: true
+          default: "pzaino/thecrowler-ci-cd-support"
+        dry_run:
+          description: "Do not push tags or create the release"
+          required: false
+          default: "false"
+        prerelease:
+          description: "Mark as pre-release"
+          required: false
+          default: "false"
+  
+  permissions:
+    contents: read
+  
+  jobs:
+    release:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout target repo
+          uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+          with:
+            repository: ${{ inputs.target_repo }}
+            token: ${{ secrets.RELEASE_PAT }}
+            fetch-depth: 0
+  
+        - name: Read release version
+          id: get_version
+          run: |
+            if [ ! -f RELEASE_VERSION.txt ]; then
+              echo "RELEASE_VERSION.txt not found!" >&2
+              exit 1
+            fi
+            VERSION=$(tr -d ' \n' < RELEASE_VERSION.txt)
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "Release version: $VERSION"
+  
+        - name: Validate version format
+          run: |
+            VERSION="${{ steps.get_version.outputs.version }}"
+            if ! [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "ERROR: Version must match vMAJOR.MINOR.PATCH"
+              exit 1
+            fi
+  
+        - name: Ensure tag does not already exist
+          run: |
+            VERSION="${{ steps.get_version.outputs.version }}"
+            if git rev-parse "$VERSION" >/dev/null 2>&1; then
+              echo "ERROR: Tag $VERSION already exists!"
+              exit 1
+            fi
+  
+        - name: Create and push vX.Y.Z tag
+          if: ${{ inputs.dry_run != 'true' }}
+          run: |
+            VERSION="${{ steps.get_version.outputs.version }}"
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git tag "$VERSION"
+            git push origin "$VERSION"
+  
+        - name: Find previous tag
+          id: prev
+          run: |
+            VERSION="${{ steps.get_version.outputs.version }}"
+            PREV=$(git describe --tags --abbrev=0 "${VERSION}^" 2>/dev/null || true)
+            echo "prev_tag=$PREV" >> "$GITHUB_OUTPUT"
+  
+        - name: Create GitHub release
+          if: ${{ inputs.dry_run != 'true' }}
+          uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
+          with:
+            tag_name: ${{ steps.get_version.outputs.version }}
+            name: Release ${{ steps.get_version.outputs.version }}
+            body: |
+              Release ${{ steps.get_version.outputs.version }}
+  
+              **Full Changelog**:
+              https://github.com/${{ inputs.target_repo }}/compare/${{ steps.prev.outputs.prev_tag }}...${{ steps.get_version.outputs.version }}
+            generate_release_notes: true
+            prerelease: ${{ inputs.prerelease }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
+  
+        - name: Update floating tags vMAJOR and vMAJOR.MINOR
+          if: ${{ inputs.dry_run != 'true' }}
+          run: |
+            set -euo pipefail
+            VERSION="${{ steps.get_version.outputs.version }}"
+            MAJOR="${VERSION#v}"; MAJOR="${MAJOR%%.*}"
+            REST="${VERSION#v$MAJOR.}"; MINOR="${REST%%.*}"
+  
+            git tag -fa "v${MAJOR}" -m "v${MAJOR} -> ${VERSION}" "${VERSION}"
+            git tag -fa "v${MAJOR}.${MINOR}" -m "v${MAJOR}.${MINOR} -> ${VERSION}" "${VERSION}"
+            git push origin --force "v${MAJOR}" "v${MAJOR}.${MINOR}"
+  
